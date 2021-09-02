@@ -223,7 +223,13 @@ class DataExportMixin(object):
                     path += '__'  # Legacy format to append a __ here.
 
                 new_model = get_model_from_path_string(model_class, path)
-                model_field = new_model._meta.get_field_by_name(field)[0]
+
+                try:
+                    model_field = new_model._meta.get_field_by_name(field)[0]
+                except AttributeError:
+                    # For Django > 2.2
+                    model_field = new_model._meta.get_field(field)
+
                 choices = model_field.choices
                 new_display_fields.append(DisplayField(
                     path, '', field, '', '', None, None, choices, ''
